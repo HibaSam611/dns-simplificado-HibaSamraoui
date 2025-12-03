@@ -56,12 +56,11 @@ public class ServidorDNS {
 
                 try {
 
-                    if (comando.equals("EXIT")) {
+                    if (comando.equalsIgnoreCase("EXIT")) {
                         salida.println("200 Bye");
                         break;
                     }
 
-                    // Si empieza con LOOKUP
                     if (comando.startsWith("LOOKUP")) {
                         String[] partes = comando.split(" ");
                         if (partes.length != 3) {
@@ -85,13 +84,28 @@ public class ServidorDNS {
                             salida.println("404 Not Found"); //no existe
                         }
 
-                    } else {
-                        // otra cosa no es válida
-                        salida.println("400 Bad request");
+
+                    }
+                    if (comando.equalsIgnoreCase("LIST")) {
+
+                        // Inicio del listado
+                        salida.println("150 Inicio listado");
+
+                        // recorremos el hashmap
+                        for (String dominio : baseDNS.keySet()) {
+                            String ip = baseDNS.get(dominio);
+
+                            salida.println(dominio + " A " + ip);
+                        }
+
+                        // Fin del listado
+                        salida.println("226 Fin listado");
+                        continue;
                     }
 
+                    salida.println("400 Bad request");
+
                 } catch (Exception e) {
-                    // Si algo falla al procesar el  LOOKUP
                     salida.println("500 Server error");
                 }
             }
